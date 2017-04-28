@@ -6,4 +6,6 @@
 # For more information, visit: https://tessel.io/docs/cli#usage
 lib/*
 CoffeeMaker.js
+Network.js
+server.js
 index.js

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-NODE=`which node`
+NODE=`which node` # find the node executable on this system
 
 coffee: ; \
-    ${NODE} client/index.js
+    ${NODE} client/index.js # run the client script using the found node above
 
 .SILENT: coffee # no unnecesary makefile output
 

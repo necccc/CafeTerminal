@@ -2,11 +2,13 @@
   "name": "cafe-terminal",
   "version": "1.0.0",
   "description": "",
-  "main": "server/index.js",
+  "main": "index.js",
   "dependencies": {
+    "ambient-attx4": "0.2.11",
+    "relay-mono": "0.1.3",
     "ws": "2.3.1"
   },
-   "devDependencies": {
+  "devDependencies": {
     "progress": "2.0.0",
     "babel-cli": "^6.16.0",
     "babel-preset-es2015": "^6.16.0",
@@ -14,13 +16,13 @@
   },
   "scripts": {
     "deploy": "npm run cleanup && npm run t2:erase ; npm run build && npm run copy && cd build/ && npm run install:prod && npm run t2:push",
-    "local": "npm run cleanup && npm run build && npm run copy && cd build/; export NODE_NOT_TESSEL=1;node index.js",
+    "local": "npm run cleanup && npm run build && npm run copy && cd build/; export NODE_NOT_TESSEL=1 ; node index.js",
     "device": "npm run cleanup && npm run build && npm run copy && cd build/ && npm run install:prod && npm run t2:run",
     "cleanup": "rm -rf build; mkdir build",
     "t2:erase": "t2 erase",
     "t2:push": "t2 push .",
     "t2:run": "t2 run .",
-    "copy": "cp .tesselinclude build/",
+    "copy": "cp .tesselinclude package.json build/",
     "build": "npm run cleanup; babel src --out-dir build",
     "install:prod": "npm i --only=prod"
   },

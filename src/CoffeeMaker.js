@@ -1,5 +1,8 @@
 const EventEmitter = require('events')
 
+const Sensor = require('./Sensor')
+const Relay = require('./Relay')
+
 const EVENT_WARMUP_START = 'warmup-start'
 const EVENT_WARMUP_FINISHED = 'warmup-finished'
 const EVENT_BREW_START = 'brew-start'
@@ -7,13 +10,14 @@ const EVENT_BREW_FINISHED = 'brew-finished'
 const EVENT_BREW_PROGRESS = 'brew-progress'
 
 const WARM_TRESHOLD = 40
-const BREW_TIME = 15
+const DEFAULT_BREW_TIME = 15
 
 class CoffeeMaker extends EventEmitter {
 
     constructor () {
-        super()
+        super() // invoke the constructor of the superclass EventEmitter
 
+        // set basic state
         this.state = {
             warm: false,
             brewing: false,
@@ -21,27 +25,25 @@ class CoffeeMaker extends EventEmitter {
             warmlevel: 0
         }
 
-//        this.on(EVENT_WARMUP_START)
-        this.on(EVENT_WARMUP_FINISHED, () => {
-            this.state.warm = true
-            setTimeout(() => this.brewStart(), 0)
-        })
+        this.sensor = new Sensor()
+        this.sensor.on(Sensor.events.HIGH, () => this.onWarm())
+        this.sensor.on(Sensor.events.LOW, () => this.onCold())
 
-        setInterval(() => this.checkWarming(), 1000)
+        this.relay = new Relay()
 
     }
 
-    start (brewTime = BREW_TIME) {
-        if (this.state.active) return; // already working
+    start (brewTime = DEFAULT_BREW_TIME) {
+        if (this.state.active) return; // already working, do nothing now
 
-        this.state.active = true
-        this.brewTime = brewTime
+        this.state.active = true // set proper state
+        this.brewTime = brewTime // store the received brew time parameter
 
-        this.powerOn()
+        this.powerOn() // flip the power-on switch
     }
 
     powerOn () {
-        console.log('tell t2 relay to activate A')
+        this.relay.powerOn(1)
 
         if (this.state.warm) return // already warm
 
@@ -49,8 +51,8 @@ class CoffeeMaker extends EventEmitter {
     }
 
     powerOff () {
-        console.log('tell t2 relay to deactivate A')
-        console.log('tell t2 relay to deactivate B')
+        this.relay.powerOff(1)
+        this.relay.powerOff(2)
 
         clearInterval(this.state.brewRegister)
 
@@ -61,7 +63,7 @@ class CoffeeMaker extends EventEmitter {
     }
 
     brewStart () {
-        console.log('tell t2 relay to activate B')
+        this.relay.powerOn(2)
 
         this.emit(EVENT_BREW_START)
 
@@ -77,12 +79,12 @@ class CoffeeMaker extends EventEmitter {
         }
 
         this.emit(EVENT_BREW_PROGRESS)
-
     }
 
     brewStop () {
         clearInterval(this.state.brewRegister)
-        console.log('tell t2 relay to deactivate B')
+
+        this.relay.powerOff(2)
 
         this.emit(EVENT_BREW_FINISHED)
 
@@ -90,22 +92,19 @@ class CoffeeMaker extends EventEmitter {
         this.powerOff()
     }
 
-    checkWarming () {
+    onWarm () {
+        if (!this.state.active) return
+        if (this.state.warm) return
 
-        let lightlevel = 0
+        console.log('onWarm')
 
-// mock
-if (this.state.active && !this.state.warm) {
-    lightlevel = this.state.warmlevel + 5;
-}
-//console.log(lightlevel, this.state.warmlevel)
-// mock
+        this.state.warm = true
+        this.emit(EVENT_WARMUP_FINISHED);
+    }
 
-        if (!this.state.warm && lightlevel > WARM_TRESHOLD) {
-            return this.emit(EVENT_WARMUP_FINISHED);
-        }
-
-        this.state.warmlevel = lightlevel
+    onCold () {
+        this.state.warm = false
+        console.log('onCold')
     }
 
 }
