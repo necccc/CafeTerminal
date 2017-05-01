@@ -24,7 +24,10 @@
     "t2:run": "t2 run .",
     "copy": "cp .tesselinclude package.json build/",
     "build": "npm run cleanup; babel src --out-dir build",
-    "install:prod": "npm i --only=prod"
+    "install:prod": "npm i --only=prod",
+    "calibrate": "npm run cleanup && npm run t2:erase ; npm run calibrate:build && npm run calibrate:copy && cd build/ && npm run install:prod && npm run t2:run",
+    "calibrate:build": "npm run cleanup; babel calibrate --out-dir build",
+    "calibrate:copy": "cp package.json build/"
   },
   "repository": {
     "type": "git",
