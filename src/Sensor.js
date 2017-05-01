@@ -11,25 +11,31 @@ if (!process.env.NODE_NOT_TESSEL) {
     ambientlib = require('ambient-attx4');
 }
 
-const INTERVAL = 200
-const LEVEL_TRESHOLD = 10
+const INTERVAL = 100
+const LEVEL_TRESHOLD = 6
 
 const HIGH = 'high'
 const LOW = 'low'
 
 class Sensor extends EventEmitter {
 
-    constructor () {
+    constructor (options) {
         super()
+
+        let sensor_interval = INTERVAL
+
+        if (options && options.debug) this.debug = true;
+
+        if (options && options.interval) sensor_interval = options.interval;
 
         if (ambientlib) {
             // Connect to our ambient sensor.
             this.ambient = ambientlib.use(tessel.port['A'])
 
             // start checking levels
-            setInterval(() => this.checkLevel(), INTERVAL)
+            setInterval(() => this.checkLevel(), sensor_interval)
         } else {
-            setInterval(() => this.checkLevel_emulated(), INTERVAL)
+            setInterval(() => this.checkLevel_emulated(), sensor_interval)
         }
     }
 
@@ -51,17 +57,21 @@ class Sensor extends EventEmitter {
             // save the current measured value
             this.level = level
 
+            if (this.debug) {
+                console.log(Math.round(diff))
+            }
+
             // Check if the difference between the last measurement
             // is large enough in a direction (up or down).
             // If so, emit the correct event
 
             if (diff > LEVEL_TRESHOLD) {
-                console.log(diff)
+                console.log('----[ HIGH ]---------------')
                 this.emit(HIGH)
             }
 
             if (diff < LEVEL_TRESHOLD * -1) {
-                console.log(diff)
+                console.log('----[ LOW ]---------------')
                 this.emit(LOW)
             }
         })

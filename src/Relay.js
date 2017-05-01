@@ -31,7 +31,21 @@ class Relay extends EventEmitter {
         if (!this.relay) return;
         if (!this.ready) return;
 
-        this.relay.turnOn(index, () => {})
+        // if relay 2 is on:
+        // DO NOT TURN ON THE 1ST ONE
+        // seems like it creates a power surge in the Coffee Machine, 
+        // that fries the relay 
+        if (index === 1) {
+            this.relay.getState(2, (err, state) => {
+                if (!state) {
+                    this.relay.turnOn(index, () => {})
+                } else {
+                    console.log('Relay 2 is on - skipping 1 to protect the relay')
+                }
+            })
+        } else {
+            this.relay.turnOn(index, () => {})
+        }
     }
 
     powerOff (index) {
