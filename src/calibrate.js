@@ -6,7 +6,7 @@
 
 const WebSocket = require('ws');
 
-//const Relay = require('./Relay')
+const Relay = require('./Relay')
 const Sensor = require('./Sensor')
 const Network = require('./Network')
 
@@ -15,11 +15,11 @@ const net = new Network()
 net.once(Network.events.READY, () => {
 
     console.log('network ready')
-        
+
     const wss = new WebSocket.Server({ port: 8080 });
 
-    const sensor = new Sensor({ debug: true, interval: 100 })
-    //const relay = new Relay()
+    const sensor = new Sensor({ port: 'A', debug: true, interval: 100 })
+    const relay = new Relay({port: 'B'})
 
     wss.on('error', (err) => {
         console.log('WebSocket Server error')
@@ -36,13 +36,15 @@ net.once(Network.events.READY, () => {
             return;
         }
 
-        ws.on('message', (message) => { 
+        ws.on('message', (message) => {
             let d = JSON.parse(message)
 
+            console.log(d)
+
             if (d.toggle) {
-             //   relay.powerOn(d.port)
+                relay.powerOn(d.port)
             } else [
-             //   relay.powerOff(d.port)
+                relay.powerOff(d.port)
             ]
         });
 

@@ -25,11 +25,11 @@ class CoffeeMaker extends EventEmitter {
             warmlevel: 0
         }
 
-        this.sensor = new Sensor()
+        this.sensor = new Sensor({ port: 'A' })
         this.sensor.on(Sensor.events.HIGH, () => this.onWarm())
         this.sensor.on(Sensor.events.LOW, () => this.onCold())
 
-        this.relay = new Relay()
+        this.relay = new Relay({ port: 'B' })
 
     }
 

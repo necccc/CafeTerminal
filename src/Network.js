@@ -30,7 +30,7 @@ class Network extends EventEmitter {
             this.network.wifi.disable()
             this.network.ap.disable()
             this.network.ap.on(ERROR, (err) => this.onError(err))
-            this.network.ap.on(CREATE, (settings) => this.onCreated(settings))
+            this.network.ap.once(CREATE, (settings) => this.onCreated(settings))
         }
     }
 
@@ -51,6 +51,7 @@ class Network extends EventEmitter {
     }
 
     onCreated (settings) {
+        console.log(settings)
         this.emit(READY)
     }
 

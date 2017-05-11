@@ -10,12 +10,10 @@ class Toggle extends EventEmitter {
         process.stdin.setRawMode(true);
 
         process.stdin.on('keypress', (str, key) => {
-            //console.log(str)
-            //console.log(key)
+            console.log(str)
+            console.log(key)
 
             if (key.name === 'c' && key.ctrl) return process.exit();
-
-            if (key.name === 'space') return this.emit('space');
 
             if (key.name === 'a') return this.emit('key-a');
 
@@ -23,7 +21,7 @@ class Toggle extends EventEmitter {
 
         })
 
-    }    
+    }
 }
 
 const toggle = new Toggle()
@@ -38,11 +36,11 @@ let b_state = false;
 
 ws.on('open', () => {
 
-    toggle.on('space', () => {
+    toggle.on('key-a', () => {
         console.log('.a')
         a_state = !a_state
         ws.send(JSON.stringify({
-            port: 1, 
+            port: 1,
             toggle: a_state
         }))
     })
@@ -51,7 +49,7 @@ ws.on('open', () => {
         console.log('.b')
         b_state = !b_state
         ws.send(JSON.stringify({
-            port: 2, 
+            port: 2,
             toggle: b_state
         }))
     })
@@ -60,5 +58,6 @@ ws.on('open', () => {
 
 
 ws.on('close', () => {
-    toggle.removeAllListeners('space')
+    toggle.removeAllListeners('key-a')
+    toggle.removeAllListeners('key-b')
 });

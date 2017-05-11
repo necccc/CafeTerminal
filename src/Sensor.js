@@ -19,23 +19,26 @@ const LOW = 'low'
 
 class Sensor extends EventEmitter {
 
-    constructor (options) {
+    constructor ({ port = 'A', debug = false, interval = INTERVAL} = {}) {
         super()
 
-        let sensor_interval = INTERVAL
+        this.interval = interval
+        this.port = port.toUpperCase()
+        this.debug = debug;
 
-        if (options && options.debug) this.debug = true;
+// ambient.setLightTrigger( triggerVal, callback(err, triggerVal) )
+// Sets a trigger to emit a 'light-trigger' event when triggerVal is reached. triggerVal is a float between 0 and 1.0.
 
-        if (options && options.interval) sensor_interval = options.interval;
+
 
         if (ambientlib) {
             // Connect to our ambient sensor.
-            this.ambient = ambientlib.use(tessel.port['A'])
+            this.ambient = ambientlib.use(tessel.port[this.port])
 
             // start checking levels
-            setInterval(() => this.checkLevel(), sensor_interval)
+            setInterval(() => this.checkLevel(), this.interval)
         } else {
-            setInterval(() => this.checkLevel_emulated(), sensor_interval)
+            setInterval(() => this.checkLevel_emulated(), this.interval)
         }
     }
 
@@ -65,12 +68,12 @@ class Sensor extends EventEmitter {
             // is large enough in a direction (up or down).
             // If so, emit the correct event
 
-            if (diff > LEVEL_TRESHOLD) {
+            if (diff >= LEVEL_TRESHOLD) {
                 console.log('----[ HIGH ]---------------')
                 this.emit(HIGH)
             }
 
-            if (diff < LEVEL_TRESHOLD * -1) {
+            if (diff <= LEVEL_TRESHOLD * -1) {
                 console.log('----[ LOW ]---------------')
                 this.emit(LOW)
             }

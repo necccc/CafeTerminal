@@ -12,12 +12,15 @@ if (!process.env.NODE_NOT_TESSEL) {
 
 class Relay extends EventEmitter {
 
-    constructor () {
+    constructor ({ port = 'A', safe = false } = {}) {
         super()
+
+        this.port = port.toUpperCase()
+        this.safeMode = safe
 
         if (relaylib) {
             // Connect to relay module
-            this.relay = relaylib.use(tessel.port['B'])
+            this.relay = relaylib.use(tessel.port[this.port])
 
             // Set ready state if available
             this.relay.on('ready', () => { this.ready = true })
@@ -34,8 +37,8 @@ class Relay extends EventEmitter {
         // if relay 2 is on:
         // DO NOT TURN ON THE 1ST ONE
         // seems like it creates a power surge in the Coffee Machine, 
-        // that fries the relay 
-        if (index === 1) {
+        // that fries the relay
+        if (this.safeMode && index === 1) {
             this.relay.getState(2, (err, state) => {
                 if (!state) {
                     this.relay.turnOn(index, () => {})
