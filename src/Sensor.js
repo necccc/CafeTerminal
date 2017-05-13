@@ -13,6 +13,7 @@ if (!process.env.NODE_NOT_TESSEL) {
 
 const INTERVAL = 100
 const LEVEL_TRESHOLD = 6
+const LIGHT_TRIGGER = 0.038
 
 const HIGH = 'high'
 const LOW = 'low'
@@ -28,18 +29,29 @@ class Sensor extends EventEmitter {
 
 // ambient.setLightTrigger( triggerVal, callback(err, triggerVal) )
 // Sets a trigger to emit a 'light-trigger' event when triggerVal is reached. triggerVal is a float between 0 and 1.0.
-
+// # ambient.on( 'light-trigger', callback(lightTriggerValue) )
 
 
         if (ambientlib) {
             // Connect to our ambient sensor.
             this.ambient = ambientlib.use(tessel.port[this.port])
-
-            // start checking levels
-            setInterval(() => this.checkLevel(), this.interval)
+            this.ambient.on('ready', () => this.onReady())
+            this.ambient.on('light-trigger', (value) => {
+                console.log('light-trigger')
+                this.emit(HIGH, value)
+            })
         } else {
             setInterval(() => this.checkLevel_emulated(), this.interval)
         }
+    }
+
+    onReady () {
+
+        console.log('ready')
+
+        this.ambient.setLightTrigger(LIGHT_TRIGGER, (err, value) => {
+            console.log('setLightTrigger', err, value)
+        })
     }
 
     checkLevel () {

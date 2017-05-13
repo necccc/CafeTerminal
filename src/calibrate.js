@@ -19,6 +19,11 @@ net.once(Network.events.READY, () => {
     const wss = new WebSocket.Server({ port: 8080 });
 
     const sensor = new Sensor({ port: 'A', debug: true, interval: 100 })
+
+    sensor.on(Sensor.events.HIGH, (level) => {
+        console.log('light HIGH', level)
+    })
+
     const relay = new Relay({port: 'B'})
 
     wss.on('error', (err) => {

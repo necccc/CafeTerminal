@@ -7,7 +7,7 @@ var relaylib = null
 // just set the NODE_NOT_TESSEL enviroment variable to some truthy value
 if (!process.env.NODE_NOT_TESSEL) {
     tessel = require('tessel');
-    relaylib = require('relay-mono');
+    relaylib = require('tessel-gpio-relay');
 }
 
 class Relay extends EventEmitter {
@@ -20,7 +20,7 @@ class Relay extends EventEmitter {
 
         if (relaylib) {
             // Connect to relay module
-            this.relay = relaylib.use(tessel.port[this.port])
+            this.relay = relaylib.use(tessel.port[this.port], [1,2])
 
             // Set ready state if available
             this.relay.on('ready', () => { this.ready = true })
@@ -47,7 +47,7 @@ class Relay extends EventEmitter {
                 }
             })
         } else {
-            this.relay.turnOn(index, () => {})
+            this.relay.turnOn(index)
         }
     }
 
@@ -57,7 +57,7 @@ class Relay extends EventEmitter {
         if (!this.relay) return;
         if (!this.ready) return;
 
-        this.relay.turnOff(index, () => {})
+        this.relay.turnOff(index)
     }
 }
 
