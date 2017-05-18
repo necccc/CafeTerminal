@@ -3,10 +3,7 @@ const CoffeeMaker = require('./CoffeeMaker')
 const Events = require('./lib/event-factory')
 const messageParse = require('./lib/message-parser.js')
 
-
 module.exports.create = function () {
-    console.log('Starting server')
-
     const wss = new WebSocket.Server({ port: 8080 });
     const coffeeMaker = new CoffeeMaker()
 
@@ -46,8 +43,6 @@ module.exports.create = function () {
             if (event.type === 'start') {
                 coffeeMaker.start(event.data[0])
             }
-
-            console.log(event)
         });
 
         ws.on('close', () => {

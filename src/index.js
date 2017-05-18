@@ -4,8 +4,8 @@ const server = require('./server')
 const net = new Network()
 
 net.once(Network.events.READY, () => {
-    server.create()
+    server.create() // if the network ready, fire up the websocket server
 })
 
-net.create()
+net.create() // boot up networking
 

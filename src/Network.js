@@ -20,7 +20,7 @@ class Network extends EventEmitter {
         this.created = false
         this.config = CONFIG
 
-        if (process.env.NODE_NOT_TESSEL) {
+        if (process.env.NODE_NOT_TESSEL) { // skip the use of HW api if we're on desktop
             setTimeout(() => this.onCreated(null, {}), 100)
             return;
         } else {
@@ -41,7 +41,7 @@ class Network extends EventEmitter {
 
         this.created = true
 
-        if (process.env.NODE_NOT_TESSEL) return;
+        if (process.env.NODE_NOT_TESSEL) return; // skip the use of HW api if we're on desktop
 
         this.network.ap.create({
             ssid,
@@ -51,7 +51,7 @@ class Network extends EventEmitter {
     }
 
     onCreated (settings) {
-        console.log(settings)
+        console.log(settings) // will put our IP address to the console
         this.emit(READY)
     }
 

@@ -10,7 +10,7 @@ const EVENT_BREW_FINISHED = 'brew-finished'
 const EVENT_BREW_PROGRESS = 'brew-progress'
 
 const WARM_TRESHOLD = 40
-const DEFAULT_BREW_TIME = 15
+const DEFAULT_BREW_TIME = 25
 
 class CoffeeMaker extends EventEmitter {
 
@@ -56,6 +56,7 @@ class CoffeeMaker extends EventEmitter {
 
         clearInterval(this.state.brewRegister)
 
+        // reset state
         this.state.active = false
         this.state.warm = false
         this.state.brewing = false
@@ -63,12 +64,13 @@ class CoffeeMaker extends EventEmitter {
     }
 
     brewStart () {
-        this.relay.powerOn(2)
+        this.relay.powerOn(2) // power on the pump
 
         this.emit(EVENT_BREW_START)
 
         this.state.brewing = true
 
+        // start notifying the client of the brew progress
         this.state.brewRegister = setInterval(() => this.brewProgress(), 1000)
     }
 
@@ -96,15 +98,12 @@ class CoffeeMaker extends EventEmitter {
         if (!this.state.active) return
         if (this.state.warm) return
 
-        console.log('onWarm')
-
         this.state.warm = true
         this.emit(EVENT_WARMUP_FINISHED);
     }
 
     onCold () {
         this.state.warm = false
-        console.log('onCold')
     }
 
 }

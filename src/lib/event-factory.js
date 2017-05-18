@@ -1,4 +1,7 @@
-
+// create 'standardized' events that travel between server and client
+// can be more error prone sending strings from the client/server code,
+// since we use object methods that instantly show up as an error when mistyped,
+// instead of strings
 
 const event = {
     type: '',
