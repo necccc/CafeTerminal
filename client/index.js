@@ -4,7 +4,7 @@ const ProgressBar = require('progress')
 const Events = require('../src/lib/event-factory')
 const messageParse = require('../src/lib/message-parser.js')
 
-const BREW_DURATION = 5
+const BREW_DURATION = 8
 
 const WebSocket = require('ws');
 

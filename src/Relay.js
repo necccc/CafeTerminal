@@ -7,6 +7,9 @@ var relaylib = null
 // just set the NODE_NOT_TESSEL enviroment variable to some truthy value
 if (!process.env.NODE_NOT_TESSEL) {
     tessel = require('tessel');
+
+    // not using the default tessel relay module here
+    // wrote this lib to be able to connect any relay module on GPIO
     relaylib = require('tessel-gpio-relay');
 }
 
